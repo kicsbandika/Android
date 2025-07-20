@@ -1,0 +1,32 @@
+package com.example.myapplication;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+
+public class MovieDetailsActivity extends AppCompatActivity {
+    TextView title, date;
+    ImageView poster;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_movie_details);
+
+        title = findViewById(R.id.detailsTitle);
+        date = findViewById(R.id.detailsDate);
+        poster = findViewById(R.id.detailsPoster);
+
+        Intent intent = getIntent();
+        title.setText(intent.getStringExtra("title"));
+        date.setText(intent.getStringExtra("date"));
+        Glide.with(this)
+                .load(intent.getStringExtra("poster"))
+                .into(poster);
+    }
+}
