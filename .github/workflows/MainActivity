@@ -1,0 +1,61 @@
+package com.example.myapplication;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class MainActivity extends AppCompatActivity {
+    Context contextMainActivty;
+    RecyclerView recyclerView;
+    MovieRecycler adapter;
+    ArrayList<Movie> movieList = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        recyclerView = findViewById(R.id.recyclerViewMain);
+        adapter = new MovieRecycler(contextMainActivty, movieList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        fetchMovies();
+    }
+
+    private void fetchMovies() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://yourapi.com/") // <-- cseréld le
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        MovieApi api = retrofit.create(MovieApi.class);
+        api.getMovies().enqueue(new Callback<List<Movie>>() {
+            @Override
+            public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
+                if (response.isSuccessful()) {
+                    movieList.addAll(response.body());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Movie>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error loading movies", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
